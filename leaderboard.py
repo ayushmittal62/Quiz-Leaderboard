@@ -2,7 +2,7 @@ import pandas as pd
 import streamlit as st
 
 # Define the path to the Excel file on the server
-file_path = 'E:/PT_CWH/projects/HashTag Generator/quiz1.xlsx'
+file_path = 'quiz1.xlsx'
 
 # Load the data directly from the file
 data = pd.read_excel(file_path)
