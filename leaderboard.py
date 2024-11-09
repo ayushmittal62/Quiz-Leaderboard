@@ -22,7 +22,7 @@ st.markdown("<h2 style='text-align: center; color: white;'>E-Cell PIET Presents 
 
 
 # Load both quiz files
-quiz1_path = 'quiz1.xlsx'
+quiz1_path = 'quiz2.xlsx'
 quiz2_path = 'quiz3.xlsx'
 
 # Load the data from both quizzes
