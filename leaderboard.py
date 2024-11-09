@@ -50,8 +50,8 @@ leaderboard_df['Rank'] = range(1, len(leaderboard_df) + 1)
 final_leaderboard = leaderboard_df[['Rank', 'Name', 'Roll Number', 'Score_Quiz1', 'Score_Quiz2', 'Total_Score']]
 
 # Display in Streamlit without index column
-st.title("Final Scores for Both Quizzes")
-st.write("Rankings based on the total score:")
+st.title("E-Cell PIET Presents 🏆 Quiz Competition Leaderboard")
+st.write("Top participants rank:")
 
 # Use st.dataframe to display the table, increase size of the table box
 st.dataframe(final_leaderboard.set_index('Rank'), height=600, width=900)
