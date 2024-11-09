@@ -21,8 +21,8 @@ with col2:
 st.markdown("<h2 style='text-align: center; color: white;'>E-Cell PIET Presents 🏆 Quiz Leaderboard</h2>", unsafe_allow_html=True)
 
 # Load both quiz files
-quiz1_path = 'quiz1.xlsx'
-quiz2_path = 'quiz4.xlsx'
+quiz1_path = 'quiz11.xlsx'
+quiz2_path = 'quiz22.xlsx'
 
 # Load the data from both quizzes
 quiz1_data = pd.read_excel(quiz1_path, dtype={'Roll Number': str})
@@ -62,8 +62,9 @@ leaderboard_df['Score_Quiz2'] = leaderboard_df['Score_Quiz2'].fillna(0).astype(i
 # Calculate total score and convert it to integer
 leaderboard_df['Total_Score'] = (leaderboard_df['Score_Quiz1'] + leaderboard_df['Score_Quiz2']).astype(int)
 
-# Sort by Total Score (descending) and Earliest Timestamp (ascending)
+# Drop duplicate Roll Number entries, keeping the row with the highest Total_Score or latest Timestamp
 leaderboard_df = leaderboard_df.sort_values(by=['Total_Score', 'Timestamp_Quiz1', 'Timestamp_Quiz2'], ascending=[False, True, True])
+leaderboard_df = leaderboard_df.drop_duplicates(subset=['Roll Number'], keep='first')
 
 # Add ranking
 leaderboard_df['Rank'] = range(1, len(leaderboard_df) + 1)
