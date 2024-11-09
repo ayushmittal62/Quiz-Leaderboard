@@ -54,4 +54,4 @@ st.title("E-Cell PIET Presents 🏆 Quiz Competition Leaderboard")
 st.write("Top participants rank:")
 
 # Use st.dataframe to display the table, increase size of the table box
-st.dataframe(final_leaderboard.set_index('Rank'), height=600, width=900)
+st.dataframe(final_leaderboard.set_index('Rank'), height=1800, width=900)
