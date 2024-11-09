@@ -1,13 +1,33 @@
 import pandas as pd
 import streamlit as st
+from pathlib import Path
+
+# Load and display logo
+col1, col2 = st.columns([1, 3])
+
+# Load and display the logo in the first column
+logo_path = 'logo.png'  # Update to the correct path for your logo file
+with col1:
+    if Path(logo_path).is_file():
+        st.image(logo_path, width=100)  # Adjust width as needed
+    else:
+        st.write("Logo file not found.")
+
+# Display "Team Astrive" title in the second column
+with col2:
+    st.markdown("<h1 style='text-align: left; color: white;'>Team Astrive</h1>", unsafe_allow_html=True)
+
+# Add the main leaderboard title below the logo and "Team Astrive"
+st.markdown("<h2 style='text-align: center; color: white;'>E-Cell PIET Presents 🏆 Quiz Leaderboard</h2>", unsafe_allow_html=True)
+
 
 # Load both quiz files
 quiz1_path = 'quiz1.xlsx'
 quiz2_path = 'quiz3.xlsx'
 
 # Load the data from both quizzes
-quiz1_data = pd.read_excel(quiz1_path, dtype={'Roll Number': str})  # Load Roll Number as string
-quiz2_data = pd.read_excel(quiz2_path, dtype={'Roll Number': str})  # Load Roll Number as string
+quiz1_data = pd.read_excel(quiz1_path, dtype={'Roll Number': str})
+quiz2_data = pd.read_excel(quiz2_path, dtype={'Roll Number': str})
 
 # Remove unnamed columns if present
 quiz1_data = quiz1_data.loc[:, ~quiz1_data.columns.str.contains('^Unnamed')]
@@ -50,8 +70,5 @@ leaderboard_df['Rank'] = range(1, len(leaderboard_df) + 1)
 final_leaderboard = leaderboard_df[['Rank', 'Name', 'Roll Number', 'Score_Quiz1', 'Score_Quiz2', 'Total_Score']]
 
 # Display in Streamlit without index column
-st.title("E-Cell PIET Presents 🏆 Quiz Competition Leaderboard")
-st.write("Top participants rank:")
-
 # Use st.dataframe to display the table, increase size of the table box
 st.dataframe(final_leaderboard.set_index('Rank'), height=1800, width=900)
