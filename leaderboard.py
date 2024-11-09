@@ -2,7 +2,7 @@ import pandas as pd
 import streamlit as st
 
 # Load both quiz files
-quiz1_path = 'quiz2.xlsx'
+quiz1_path = 'quiz1.xlsx'
 quiz2_path = 'quiz3.xlsx'
 
 # Load the data from both quizzes
