@@ -21,7 +21,7 @@ with col2:
 st.markdown("<h2 style='text-align: center; color: white;'>E-Cell PIET Presents 🏆 Quiz Leaderboard</h2>", unsafe_allow_html=True)
 
 # Load both quiz files
-quiz1_path = 'quiz11.xlsx'
+quiz1_path = 'quiz111.xlsx'
 quiz2_path = 'quiz22.xlsx'
 
 # Load the data from both quizzes
