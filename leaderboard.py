@@ -25,7 +25,7 @@ quiz1_path = 'quiz111.xlsx'  # Week 1 File 1
 quiz2_path = 'quiz22.xlsx'   # Week 1 File 2
 
 # Load Week 2 quiz file (provided by the user)
-quiz3_path = 'quiz3.xlsx'  # Week 2 File
+quiz3_path = 'quiz33.xlsx'  # Week 2 File
 
 # Load Week 1 data
 quiz1_data = pd.read_excel(quiz1_path, dtype={'Roll Number': str})
