@@ -20,58 +20,76 @@ with col2:
 # Add the main leaderboard title below the logo and "Team Astrive"
 st.markdown("<h2 style='text-align: center; color: white;'>E-Cell PIET Presents 🏆 Quiz Leaderboard</h2>", unsafe_allow_html=True)
 
-# Load both quiz files
-quiz1_path = 'quiz111.xlsx'
-quiz2_path = 'quiz22.xlsx'
+# Load Week 1 quiz files
+quiz1_path = 'quiz111.xlsx'  # Week 1 File 1
+quiz2_path = 'quiz22.xlsx'   # Week 1 File 2
 
-# Load the data from both quizzes
+# Load Week 2 quiz file (provided by the user)
+quiz3_path = 'quiz3.xlsx'  # Week 2 File
+
+# Load Week 1 data
 quiz1_data = pd.read_excel(quiz1_path, dtype={'Roll Number': str})
 quiz2_data = pd.read_excel(quiz2_path, dtype={'Roll Number': str})
 
-# Remove unnamed columns if present
+# Remove unnamed columns
 quiz1_data = quiz1_data.loc[:, ~quiz1_data.columns.str.contains('^Unnamed')]
 quiz2_data = quiz2_data.loc[:, ~quiz2_data.columns.str.contains('^Unnamed')]
 
-# Standardize columns for merging
-quiz1_data = quiz1_data[['Timestamp', 'Name', 'Score', 'Roll Number']].copy()
-quiz2_data = quiz2_data[['Timestamp', 'Name', 'Score', 'Roll Number']].copy()
+# Standardize Week 1 columns
+quiz1_data = quiz1_data[['Roll Number', 'Name', 'Score']].copy()
+quiz2_data = quiz2_data[['Roll Number', 'Name', 'Score']].copy()
 
-# Convert Timestamp to datetime for accurate merging and sorting
-quiz1_data['Timestamp'] = pd.to_datetime(quiz1_data['Timestamp'])
-quiz2_data['Timestamp'] = pd.to_datetime(quiz2_data['Timestamp'])
+# Rename scores for clarity
+quiz1_data = quiz1_data.rename(columns={'Score': 'Score_Quiz1'})
+quiz2_data = quiz2_data.rename(columns={'Score': 'Score_Quiz2'})
 
-# Rename score columns to differentiate between quizzes
-quiz1_data = quiz1_data.rename(columns={'Score': 'Score_Quiz1', 'Timestamp': 'Timestamp_Quiz1', 'Name': 'Name_Quiz1'})
-quiz2_data = quiz2_data.rename(columns={'Score': 'Score_Quiz2', 'Timestamp': 'Timestamp_Quiz2', 'Name': 'Name_Quiz2'})
-
-# Merge datasets on Roll Number only, using outer join to include all participants
-leaderboard_df = pd.merge(
+# Merge Week 1 data on Roll Number and calculate Week 1 total score
+week1_data = pd.merge(
     quiz1_data, quiz2_data, on='Roll Number', how='outer'
 )
 
-# Handle name columns: Combine names from both quizzes where possible, otherwise use available name
-leaderboard_df['Name'] = leaderboard_df['Name_Quiz1'].combine_first(leaderboard_df['Name_Quiz2'])
+# Handle names: Prefer names from the first quiz; if not available, take from the second quiz
+week1_data['Name'] = week1_data['Name_x'].combine_first(week1_data['Name_y'])
 
-# Drop the separate Name columns after combining
-leaderboard_df = leaderboard_df.drop(columns=['Name_Quiz1', 'Name_Quiz2'])
+# Drop intermediate columns after merging
+week1_data = week1_data[['Roll Number', 'Name', 'Score_Quiz1', 'Score_Quiz2']]
+week1_data['Score_Quiz1'] = week1_data['Score_Quiz1'].fillna(0).astype(int)
+week1_data['Score_Quiz2'] = week1_data['Score_Quiz2'].fillna(0).astype(int)
+week1_data['Week_1_Score'] = week1_data['Score_Quiz1'] + week1_data['Score_Quiz2']
 
-# Fill missing scores with 0 for participants who took only one quiz and convert scores to integer
-leaderboard_df['Score_Quiz1'] = leaderboard_df['Score_Quiz1'].fillna(0).astype(int)
-leaderboard_df['Score_Quiz2'] = leaderboard_df['Score_Quiz2'].fillna(0).astype(int)
+# Drop intermediate score columns
+week1_data = week1_data[['Roll Number', 'Name', 'Week_1_Score']]
 
-# Calculate total score and convert it to integer
-leaderboard_df['Total_Score'] = (leaderboard_df['Score_Quiz1'] + leaderboard_df['Score_Quiz2']).astype(int)
+# Load Week 2 data
+week2_data = pd.read_excel(quiz3_path, dtype={'Roll Number': str})
+week2_data = week2_data.loc[:, ~week2_data.columns.str.contains('^Unnamed')]
+week2_data = week2_data[['Roll Number', 'Name', 'Score']].copy()
+week2_data = week2_data.rename(columns={'Score': 'Week_2_Score'})
 
-# Drop duplicate Roll Number entries, keeping the row with the highest Total_Score or latest Timestamp
-leaderboard_df = leaderboard_df.sort_values(by=['Total_Score', 'Timestamp_Quiz1', 'Timestamp_Quiz2'], ascending=[False, True, True])
+# Merge Week 1 and Week 2 data
+leaderboard_df = pd.merge(
+    week1_data, week2_data, on='Roll Number', how='outer'
+)
+
+# Handle names: Prefer names from Week 1; if not available, take from Week 2
+leaderboard_df['Name'] = leaderboard_df['Name_x'].combine_first(leaderboard_df['Name_y'])
+
+# Fill missing scores with 0
+leaderboard_df['Week_1_Score'] = leaderboard_df['Week_1_Score'].fillna(0).astype(int)
+leaderboard_df['Week_2_Score'] = leaderboard_df['Week_2_Score'].fillna(0).astype(int)
+
+# Calculate total score
+leaderboard_df['Total_Score'] = leaderboard_df['Week_1_Score'] + leaderboard_df['Week_2_Score']
+
+# Remove duplicate Roll Number entries, keeping the one with the highest Total_Score
+leaderboard_df = leaderboard_df.sort_values(by=['Total_Score'], ascending=False)
 leaderboard_df = leaderboard_df.drop_duplicates(subset=['Roll Number'], keep='first')
 
 # Add ranking
 leaderboard_df['Rank'] = range(1, len(leaderboard_df) + 1)
 
-# Select final columns for display
-final_leaderboard = leaderboard_df[['Rank', 'Name', 'Roll Number', 'Score_Quiz1', 'Score_Quiz2', 'Total_Score']]
+# Final leaderboard columns
+final_leaderboard = leaderboard_df[['Rank', 'Roll Number', 'Name', 'Week_1_Score', 'Week_2_Score', 'Total_Score']]
 
-# Display in Streamlit without index column
-# Use st.dataframe to display the table, increase size of the table box
+# Display the leaderboard
 st.dataframe(final_leaderboard.set_index('Rank'), height=600, width=900)
